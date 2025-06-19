@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+<link rel="shortcut icon" href="#">
+<title>Your Vote Weight Calculator</title>
+<style>
+html {
+    height: 100%;
+    overflow: auto;
+    padding: 0;
+    margin: 0;  
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+div#outer {
+    display: table;
+    height: 100%;
+    width: 100%;
+}
+div#inner {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+div#container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 1200px;
+    min-height: 680px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    padding: 40px;
+    margin: 20px;
+}
+.calculator-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+}
+h1 {
+    font-size: 36px;
+    color: #2c3e50;
+    text-align: center;
+    line-height: 44px;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+}
+.subtitle {
+    font-size: 18px;
+    color: #7f8c8d;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 400;
+}
+.calculator-container {
+    display: grid;
+    grid-template-columns: 1fr 300px 1fr;
+    gap: 30px;
+    width: 100%;
+    max-width: 1100px;
+}
+.calculator-form {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    min-width: 350px;
+}
+.comparison-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 15px;
+    padding: 30px 20px;
+    color: white;
+    text-align: center;
+}
+.vs-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+.comparison-result {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+.comparison-highlight {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 15px 0;
+    background: rgba(255,255,255,0.2);
+    padding: 10px 15px;
+    border-radius: 8px;
+}
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+.form-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+label {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    background: white;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+.result {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+    display: none;
+}
+.result-highlight {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e74c3c;
+    margin: 10px 0;
+}
+.result-stats {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+}
+.hidden {
+    display: none !important;
+}
+
+.formula-section {
+    margin-top: 40px;
+    padding: 30px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.formula-toggle button {
+    padding: 10px 20px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.formula-block {
+    background: white;
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.formula {
+    background: #e3f2fd;
+    padding: 15px;
+    border-radius: 6px;
+    font-family: monospace;
+    margin: 10px 0;
+}
+
+.calculation-steps {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 10px 0;
+}
+
+.calculation-steps p {
+    margin: 8px 0;
+    font-family: monospace;
+}
+
+.sources {
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 6px;
+    list-style-position: inside;
+}
+
+.verification-note {
+    background: #d4edda;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 1px solid #c3e6cb;
+}
+
+.state-type {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.state-type.red {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #e57373;
+}
+
+.state-type.blue {
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #64b5f6;
+}
+
+.state-type.swing {
+    background: #f3e5f5;
+    color: #7b1fa2;
+    border: 1px solid #ba68c8;
+}
+
+.language-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.lang-btn {
+    padding: 8px 16px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.lang-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.lang-btn:hover {
+    transform: translateY(-2px);
+}
+
+.federal-spending {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.spending-positive {
+    background: #f0fff4;
+    border-left-color: #38a169;
+}
+
+.spending-negative {
+    background: #fff5f5;
+    border-left-color: #e53e3e;
+}
+
+.spending-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.spending-indicator {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.spending-positive .spending-indicator {
+    color: #2f855a;
+}
+
+.spending-negative .spending-indicator {
+    color: #c53030;
+}
+
+.spending-amount {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.spending-positive .spending-amount {
+    color: #2f855a;
+}
+
+.spending-negative .spending-amount {
+    color: #c53030;
+}
+
+.spending-details {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+.federal-balance {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.balance-receiver {
+    background: #fff5f5;
+    border-left-color: #e53e3e;
+}
+
+.balance-payer {
+    background: #f0fff4;
+    border-left-color: #38a169;
+}
+
+.balance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.balance-indicator {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.balance-receiver .balance-indicator {
+    color: #c53030;
+}
+
+.balance-payer .balance-indicator {
+    color: #2f855a;
+}
+
+.balance-ratio {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.balance-receiver .balance-ratio {
+    color: #c53030;
+}
+
+.balance-payer .balance-ratio {
+    color: #2f855a;
+}
+
+.balance-details {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+</style>
+</head>
+<body>
+    <div id="outer">
+        <div id="inner">
+            <div id="container">
+                <!-- Переключатель языка в самом верху -->
+                <div class="language-switcher">
+                    <a href="index.html" class="lang-btn">🇺🇸 English</a>
+                    <a href="ru.html" class="lang-btn active">🇷🇺 Русский</a>
+                </div>
+                
+                <div class="calculator-icon">🧮</div>
+                <h1>"Занимательная Демократия"</h1>
+                <p class="subtitle">Сравнение реального веса голосов в различных штатах</p>
+                
+                <div class="calculator-container">
+                    <!-- Левая колонка -->
+                    <div class="calculator-form">
+                        <div class="form-title">Штат А</div>
+                        <form id="vote-calculator-1">
+                            <div class="form-group">
+                                <label for="state-select-1">Выберите первый штат:</label>
+                                <select id="state-select-1" name="state" required>
+                                    <option value="">Загружается...</option>
+                                </select>
+                            </div>
+                        </form>
+                        
+                        <div id="result-1" class="result">
+                            <!-- Результат для штата 1 -->
+                        </div>
+                    </div>
+
+                    <!-- Центральная панель сравнения -->
+                    <div class="comparison-panel">
+                        <div class="vs-icon">⚖️</div>
+                        <div id="comparison-result" class="comparison-result hidden">
+                            <!-- Результат сравнения -->
+                        </div>
+                        <div class="comparison-result" id="no-comparison">
+                            Выберите два штата для сравнения
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка -->
+                    <div class="calculator-form">
+                        <div class="form-title">Штат Б</div>
+                        <form id="vote-calculator-2">
+                            <div class="form-group">
+                                <label for="state-select-2">Выберите второй штат:</label>
+                                <select id="state-select-2" name="state" required>
+                                    <option value="">Загружается...</option>
+                                </select>
+                            </div>
+                        </form>
+                        
+                        <div id="result-2" class="result">
+                            <!-- Результат для штата 2 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Блок формул -->
+                <div class="formula-section">
+                    <h3>🧮 Формулы расчета</h3>
+                    <div class="formula-toggle">
+                        <button onclick="toggleFormulas()">Показать математику</button>
+                    </div>
+    
+                    <div id="formulas" class="formulas-content" style="display: none;">
+                        <div class="formula-block">
+                            <h4>1. Вес голоса в штате</h4>
+                            <div class="formula">
+                                <strong>Вес голоса = (Общее население США ÷ 538) ÷ (Население штата ÷ Выборщики штата)</strong>
+                            </div>
+                            <div class="formula-explanation">
+                                <p><strong>Где:</strong></p>
+                                <ul>
+                                    <li>Общее население США: 331,900,000 человек (перепись 2020)</li>
+                                    <li>Общее количество выборщиков: 538</li>
+                                    <li>Средний американский избиратель на выборщика: 331,900,000 ÷ 538 = 617,100</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-block">
+                            <h4>2. Сравнение штатов</h4>
+                            <div class="formula">
+                                <strong>Соотношение = Вес голоса штата A ÷ Вес голоса штата B</strong>
+                            </div>
+                            <div class="calculation-steps">
+                                <p><strong>Wyoming vs California:</strong> 3.208 ÷ 0.843 = 3.81</p>
+                                <p><strong>Интерпретация:</strong> Голос в Wyoming в 3.81 раза сильнее голоса в California</p>
+                            </div>
+                        </div>
+    
+                        <div class="formula-block">
+                            <h4>3. Источники данных</h4>
+                            <ul class="sources">
+                                <li><strong>Население штатов:</strong> <a href="https://www.census.gov">US Census Bureau, 2020 Census</a></li>
+                                <li><strong>Количество выборщиков:</strong> <a href="https://www.archives.gov/electoral-college">National Archives, Electoral College allocation</a></li>
+                                <li><strong>Общее население:</strong> 331,900,000 (официальная перепись 2020)</li>
+								<li><strong>Налоги:</strong> <a href="https://taxfoundation.org/">Federal Tax Burden vs. Federal Spending by State</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="verification-note">
+                            <h4>✅ Проверка</h4>
+                            <p>Все расчеты основаны на официальных данных правительства США. 
+                            Каждую цифру можно проверить независимо.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<script>
+// Данные штатов - все свойства в одном месте
+const states = [
+    { code: 'AL', name: 'Alabama', population: 5024279, electors: 9, federalSpending: 9200, type: 'R', balanceRatio: 1.71 },
+    { code: 'AK', name: 'Alaska', population: 733391, electors: 3, federalSpending: 26100, type: 'R', balanceRatio: 1.82 },
+    { code: 'AZ', name: 'Arizona', population: 7151502, electors: 11, federalSpending: 8400, type: 'S', balanceRatio: 1.19 },
+    { code: 'AR', name: 'Arkansas', population: 3011524, electors: 6, federalSpending: 9800, type: 'R', balanceRatio: 1.47 },
+    { code: 'CA', name: 'California', population: 39538223, electors: 54, federalSpending: 7100, type: 'B', balanceRatio: 0.81 },
+    { code: 'CO', name: 'Colorado', population: 5773714, electors: 10, federalSpending: 8900, type: 'S', balanceRatio: 0.95 },
+    { code: 'CT', name: 'Connecticut', population: 3605944, electors: 7, federalSpending: 8600, type: 'B', balanceRatio: 0.64 },
+    { code: 'DE', name: 'Delaware', population: 989948, electors: 3, federalSpending: 11200, type: 'B', balanceRatio: 0.94 },
+    { code: 'DC', name: 'Washington D.C.', population: 689545, electors: 3, federalSpending: 35400, type: 'B', balanceRatio: 4.12 },
+    { code: 'FL', name: 'Florida', population: 21538187, electors: 30, federalSpending: 7800, type: 'S', balanceRatio: 1.15 },
+    { code: 'GA', name: 'Georgia', population: 10711908, electors: 16, federalSpending: 8100, type: 'S', balanceRatio: 1.02 },
+    { code: 'HI', name: 'Hawaii', population: 1455271, electors: 4, federalSpending: 16300, type: 'B', balanceRatio: 1.44 },
+    { code: 'ID', name: 'Idaho', population: 1839106, electors: 4, federalSpending: 9600, type: 'R', balanceRatio: 1.31 },
+    { code: 'IL', name: 'Illinois', population: 12812508, electors: 19, federalSpending: 7400, type: 'B', balanceRatio: 0.87 },
+    { code: 'IN', name: 'Indiana', population: 6785528, electors: 11, federalSpending: 7900, type: 'R', balanceRatio: 1.05 },
+    { code: 'IA', name: 'Iowa', population: 3190369, electors: 6, federalSpending: 9100, type: 'R', balanceRatio: 1.08 },
+    { code: 'KS', name: 'Kansas', population: 2937880, electors: 6, federalSpending: 9500, type: 'R', balanceRatio: 1.21 },
+    { code: 'KY', name: 'Kentucky', population: 4505836, electors: 8, federalSpending: 10200, type: 'R', balanceRatio: 1.56 },
+    { code: 'LA', name: 'Louisiana', population: 4657757, electors: 8, federalSpending: 9400, type: 'R', balanceRatio: 1.52 },
+    { code: 'ME', name: 'Maine', population: 1395722, electors: 4, federalSpending: 11800, type: 'B', balanceRatio: 1.29 },
+    { code: 'MD', name: 'Maryland', population: 6177224, electors: 10, federalSpending: 12400, type: 'B', balanceRatio: 1.18 },
+    { code: 'MA', name: 'Massachusetts', population: 7001399, electors: 11, federalSpending: 9300, type: 'B', balanceRatio: 0.71 },
+    { code: 'MI', name: 'Michigan', population: 10037261, electors: 15, federalSpending: 7600, type: 'S', balanceRatio: 0.92 },
+    { code: 'MN', name: 'Minnesota', population: 5737915, electors: 10, federalSpending: 8200, type: 'S', balanceRatio: 0.85 },
+    { code: 'MS', name: 'Mississippi', population: 2961279, electors: 6, federalSpending: 11100, type: 'R', balanceRatio: 1.84 },
+    { code: 'MO', name: 'Missouri', population: 6196038, electors: 10, federalSpending: 9000, type: 'R', balanceRatio: 1.33 },
+    { code: 'MT', name: 'Montana', population: 1084225, electors: 4, federalSpending: 12600, type: 'R', balanceRatio: 1.64 },
+    { code: 'NE', name: 'Nebraska', population: 1961504, electors: 5, federalSpending: 9700, type: 'R', balanceRatio: 1.07 },
+    { code: 'NV', name: 'Nevada', population: 3104614, electors: 6, federalSpending: 8800, type: 'S', balanceRatio: 0.98 },
+    { code: 'NH', name: 'New Hampshire', population: 1395231, electors: 4, federalSpending: 9900, type: 'S', balanceRatio: 0.89 },
+    { code: 'NJ', name: 'New Jersey', population: 9288994, electors: 14, federalSpending: 7300, type: 'B', balanceRatio: 0.74 },
+    { code: 'NM', name: 'New Mexico', population: 2117522, electors: 5, federalSpending: 13800, type: 'S', balanceRatio: 2.03 },
+    { code: 'NY', name: 'New York', population: 20201249, electors: 28, federalSpending: 8000, type: 'B', balanceRatio: 0.79 },
+    { code: 'NC', name: 'North Carolina', population: 10439388, electors: 16, federalSpending: 8300, type: 'S', balanceRatio: 1.08 },
+    { code: 'ND', name: 'North Dakota', population: 779094, electors: 3, federalSpending: 14200, type: 'R', balanceRatio: 1.68 },
+    { code: 'OH', name: 'Ohio', population: 11799448, electors: 17, federalSpending: 8100, type: 'S', balanceRatio: 1.04 },
+    { code: 'OK', name: 'Oklahoma', population: 3959353, electors: 7, federalSpending: 9800, type: 'R', balanceRatio: 1.35 },
+    { code: 'OR', name: 'Oregon', population: 4237256, electors: 8, federalSpending: 8600, type: 'B', balanceRatio: 0.97 },
+    { code: 'PA', name: 'Pennsylvania', population: 13002700, electors: 19, federalSpending: 8400, type: 'S', balanceRatio: 1.03 },
+    { code: 'RI', name: 'Rhode Island', population: 1097379, electors: 4, federalSpending: 11000, type: 'B', balanceRatio: 1.15 },
+    { code: 'SC', name: 'South Carolina', population: 5118425, electors: 9, federalSpending: 9100, type: 'R', balanceRatio: 1.42 },
+    { code: 'SD', name: 'South Dakota', population: 886667, electors: 3, federalSpending: 12800, type: 'R', balanceRatio: 1.49 },
+    { code: 'TN', name: 'Tennessee', population: 6910840, electors: 11, federalSpending: 8700, type: 'R', balanceRatio: 1.25 },
+    { code: 'TX', name: 'Texas', population: 29145505, electors: 40, federalSpending: 7200, type: 'R', balanceRatio: 0.93 },
+    { code: 'UT', name: 'Utah', population: 3271616, electors: 6, federalSpending: 8500, type: 'R', balanceRatio: 1.17 },
+    { code: 'VT', name: 'Vermont', population: 643077, electors: 3, federalSpending: 13500, type: 'B', balanceRatio: 1.11 },
+    { code: 'VA', name: 'Virginia', population: 8631393, electors: 13, federalSpending: 11600, type: 'S', balanceRatio: 1.51 },
+    { code: 'WA', name: 'Washington', population: 7705281, electors: 12, federalSpending: 9200, type: 'B', balanceRatio: 0.86 },
+    { code: 'WV', name: 'West Virginia', population: 1793716, electors: 4, federalSpending: 12300, type: 'R', balanceRatio: 1.89 },
+    { code: 'WI', name: 'Wisconsin', population: 5893718, electors: 10, federalSpending: 8000, type: 'S', balanceRatio: 0.96 },
+    { code: 'WY', name: 'Wyoming', population: 576851, electors: 3, federalSpending: 21400, type: 'R', balanceRatio: 1.78 }
+];
+
+// Хранилище результатов
+let stateResults = {};
+
+// Заполнение списков штатов
+function populateStates() {
+    const select1 = document.getElementById('state-select-1');
+    const select2 = document.getElementById('state-select-2');
+    
+    const sortedStates = states.sort((a, b) => a.name.localeCompare(b.name));
+    
+    [select1, select2].forEach(select => {
+        select.innerHTML = '<option value="">Выберите штат...</option>';
+        sortedStates.forEach(state => {
+            const option = document.createElement('option');
+            option.value = state.code;
+            option.textContent = state.name;
+            select.appendChild(option);
+        });
+    });
+}
+
+// Расчет веса голоса
+function calculateVoteWeight(stateData) {
+    const totalPopulation = 331900000;
+    const totalElectors = 538;
+    const averagePerElector = totalPopulation / totalElectors;
+    const statePerElector = stateData.population / stateData.electors;
+    const voteWeight = averagePerElector / statePerElector;
+    const nationalAvgSpending = 8500;
+    
+    return {
+        state: stateData.name,
+        code: stateData.code,
+        population: stateData.population.toLocaleString(),
+        electors: stateData.electors,
+        peoplePerElector: Math.round(statePerElector).toLocaleString(),
+        voteWeight: voteWeight,
+        voteWeightText: voteWeight.toFixed(3),
+        weightPercent: (voteWeight * 100).toFixed(1),
+        federalSpending: stateData.federalSpending,
+        federalSpendingFormatted: '$' + stateData.federalSpending.toLocaleString(),
+        spendingRatio: (stateData.federalSpending / nationalAvgSpending).toFixed(2),
+        isProfitable: stateData.federalSpending > nationalAvgSpending,
+        balanceRatio: stateData.balanceRatio,
+        balanceFormatted: stateData.balanceRatio.toFixed(2),
+        isNetReceiver: stateData.balanceRatio > 1.0
+    };
+}
+
+function getStateTypeDisplay(stateCode) {
+    const state = states.find(s => s.code === stateCode);
+    const labels = {
+        'R': '🔴 Традиционно красный',
+        'B': '🔵 Традиционно синий', 
+        'S': '🟣 Колеблющийся'
+    };
+    return labels[state?.type] || labels['R'];
+}
+
+function showStateResult(stateNum, result) {
+    const stateType = getStateTypeDisplay(result.code);
+    const resultDiv = document.getElementById(`result-${stateNum}`);
+    
+    // Определяем индикатор расходов
+    let spendingIndicator = '';
+    let spendingClass = '';
+    if (result.isProfitable) {
+        spendingIndicator = '📈 Получает больше';
+        spendingClass = 'spending-positive';
+    } else {
+        spendingIndicator = '📉 Получает меньше';
+        spendingClass = 'spending-negative';
+    }
+    
+    // Определяем индикатор баланса
+    let balanceIndicator = '';
+    let balanceClass = '';
+    if (result.isNetReceiver) {
+        balanceIndicator = '💰 Чистый получатель';
+        balanceClass = 'balance-receiver';
+    } else {
+        balanceIndicator = '💸 Чистый плательщик';
+        balanceClass = 'balance-payer';
+    }
+    
+    resultDiv.innerHTML = `
+        <h3>${result.state}</h3>
+        <div class="state-type">${stateType}</div>
+        <div class="result-highlight">Вес голоса: ${result.voteWeightText}</div>
+        <div class="result-stats">
+            <p><strong>Население:</strong> ${result.population}</p>
+            <p><strong>Выборщиков:</strong> ${result.electors}</p>
+            <p><strong>Человек/выборщик:</strong> ${result.peoplePerElector}</p>
+        </div>
+        <div class="federal-spending ${spendingClass}">
+            <div class="spending-header">
+                <span class="spending-indicator">${spendingIndicator}</span>
+                <span class="spending-amount">${result.federalSpendingFormatted}</span>
+            </div>
+            <div class="spending-details">
+                Федеральные расходы на человека (${result.spendingRatio}x от среднего по стране)
+            </div>
+        </div>
+        <div class="federal-balance ${balanceClass}">
+            <div class="balance-header">
+                <span class="balance-indicator">${balanceIndicator}</span>
+                <span class="balance-ratio">$${result.balanceFormatted}</span>
+            </div>
+            <div class="balance-details">
+                Получает $${result.balanceFormatted} на каждый $1.00 уплаченных федеральных налогов
+            </div>
+        </div>
+    `;
+    resultDiv.style.display = 'block';
+    
+    // Сохраняем результат
+    stateResults[stateNum] = result;
+    
+    // Обновляем сравнение
+    updateComparison();
+}
+
+// Обновление панели сравнения
+function updateComparison() {
+    const comparisonDiv = document.getElementById('comparison-result');
+    const noComparisonDiv = document.getElementById('no-comparison');
+    
+    if (stateResults[1] && stateResults[2]) {
+        const state1 = stateResults[1];
+        const state2 = stateResults[2];
+        const ratio = state1.voteWeight / state2.voteWeight;
+        
+        let comparisonText;
+        if (ratio > 1) {
+            comparisonText = `
+                <div>Голос в <strong>${state1.state}</strong></div>
+                <div class="comparison-highlight">${ratio.toFixed(2)}x</div>
+                <div>сильнее голоса в <strong>${state2.state}</strong></div>
+            `;
+        } else {
+            const inverseRatio = state2.voteWeight / state1.voteWeight;
+            comparisonText = `
+                <div>Голос в <strong>${state2.state}</strong></div>
+                <div class="comparison-highlight">${inverseRatio.toFixed(2)}x</div>
+                <div>сильнее голоса в <strong>${state1.state}</strong></div>
+            `;
+        }
+        
+        comparisonDiv.innerHTML = comparisonText;
+        comparisonDiv.classList.remove('hidden');
+        noComparisonDiv.classList.add('hidden');
+    } else {
+        comparisonDiv.classList.add('hidden');
+        noComparisonDiv.classList.remove('hidden');
+    }
+}
+
+function toggleFormulas() {
+    const formulas = document.getElementById('formulas');
+    const button = document.querySelector('.formula-toggle button');
+    
+    if (formulas.style.display === 'none') {
+        formulas.style.display = 'block';
+        button.textContent = 'Скрыть математику';
+    } else {
+        formulas.style.display = 'none';
+        button.textContent = 'Показать математику';
+    }
+}
+
+// Обработчики выпадающих списков
+document.getElementById('state-select-1').addEventListener('change', function() {
+    if (this.value) {
+        const stateData = states.find(state => state.code === this.value);
+        const result = calculateVoteWeight(stateData);
+        showStateResult(1, result);
+    } else {
+        document.getElementById('result-1').style.display = 'none';
+        delete stateResults[1];
+        updateComparison();
+    }
+});
+
+document.getElementById('state-select-2').addEventListener('change', function() {
+    if (this.value) {
+        const stateData = states.find(state => state.code === this.value);
+        const result = calculateVoteWeight(stateData);
+        showStateResult(2, result);
+    } else {
+        document.getElementById('result-2').style.display = 'none';
+        delete stateResults[2];
+        updateComparison();
+    }
+});
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', populateStates);
+</script>
+</body>
+</html>
